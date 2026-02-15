@@ -80,6 +80,54 @@ document.addEventListener('DOMContentLoaded', () => {
             updateUI();
         });
     });
+    // 1. 在顶部获取新元素的引用
+    const customBetInput = document.getElementById('customBetInput');
+    const confirmCustomBet = document.getElementById('confirmCustomBet');
+
+    // 2. 添加自定义下注的点击事件
+    // 确保这段代码在 document.addEventListener('DOMContentLoaded', () => { ... }) 内部
+
+    confirmCustomBet.addEventListener('click', () => {
+        if (!gameActive) return;
+
+        // --- 关键点 1：必须在点击的这一刻才去读取 .value ---
+        const inputValue = document.getElementById('customBetInput').value;
+        const betAmount = parseInt(inputValue);
+
+        // --- 关键点 2：打印到控制台调试 (按 F12 就能看到) ---
+        console.log("输入原始值:", inputValue);
+        console.log("转换后的数字:", betAmount);
+
+        // 检查是否转换成功
+        if (isNaN(betAmount)) {
+            messageDisplay.textContent = "请输入有效的数字！";
+            messageDisplay.className = 'game-message info';
+            return;
+        }
+
+        if (betAmount <= 0) {
+            messageDisplay.textContent = "下注金额必须大于 0！";
+            messageDisplay.className = 'game-message info';
+            return;
+        }
+
+        if (currentBet + betAmount > balance) {
+            messageDisplay.textContent = `筹码不足！你只有 $${balance}。`;
+            messageDisplay.className = 'game-message info';
+            return;
+        }
+
+        // --- 关键点 3：确保 currentBet 本身不是 NaN ---
+        if (isNaN(currentBet)) currentBet = 0; 
+
+        currentBet += betAmount;
+        
+        // 清空输入框方便下次输入
+        document.getElementById('customBetInput').value = ''; 
+        
+        messageDisplay.textContent = ""; 
+        updateUI();
+    });
 
     // 清空下注
     clearBetBtn.addEventListener('click', () => {
