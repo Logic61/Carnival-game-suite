@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>嘉年华骰子 - Chuck-a-Luck</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Open+Sans&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="carnival-background">
+        <header>
+            <h1><span class="sparkle">🎉</span> 嘉年华骰子 <span class="sparkle">🎉</span></h1>
+            <h2>Chuck-a-Luck</h2>
+        </header>
+
+        <main class="game-container">
+            <div class="scoreboard">
+                <p>筹码余额: $<span id="balance">100</span></p>
+                <p>下注金额: $<span id="currentBet">0</span></p>
+            </div>
+
+            <div class="player-actions">
+                <div class="betting-area">
+                    <h3>选择下注金额</h3>
+                    <div class="bet-buttons">
+                        <button class="bet-btn" data-bet="5">下注 $5</button>
+                        <button class="bet-btn" data-bet="10">下注 $10</button>
+                        <button class="bet-btn" data-bet="20">下注 $20</button>
+                        <button class="bet-btn" data-bet="all">梭哈</button>
+                        <button class="clear-bet-btn">清空下注</button>
+                    </div>
+                </div>
+
+                <div class="number-selection">
+                    <h3>选择你的幸运数字</h3>
+                    <div class="number-grid">
+                        <button class="num-btn" data-number="1">1</button>
+                        <button class="num-btn" data-number="2">2</button>
+                        <button class="num-btn" data-number="3">3</button>
+                        <button class="num-btn" data-number="4">4</button>
+                        <button class="num-btn" data-number="5">5</button>
+                        <button class="num-btn" data-number="6">6</button>
+                    </div>
+                </div>
+            </div>
+
+            <button id="rollDiceBtn" class="big-button" disabled>摇骰子！</button>
+
+            <div class="dice-display">
+                <div class="dice" id="dice1">?</div>
+                <div class="dice" id="dice2">?</div>
+                <div class="dice" id="dice3">?</div>
+            </div>
+
+            <p id="message" class="game-message"></p>
+
+            <button id="resetGameBtn" class="small-button">重新开始</button>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
