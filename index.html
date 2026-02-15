@@ -21,15 +21,18 @@
             </div>
 
             <div class="player-actions">
-                <div class="betting-area">
-                    <h3>选择下注金额</h3>
-                    <div class="bet-buttons">
-                        <button class="bet-btn" data-bet="5">下注 $5</button>
-                        <button class="bet-btn" data-bet="10">下注 $10</button>
-                        <button class="bet-btn" data-bet="20">下注 $20</button>
-                        <button class="bet-btn" data-bet="all">梭哈</button>
-                        <button class="clear-bet-btn">清空下注</button>
+                <div class="bet-buttons">
+                    <button class="bet-btn" data-bet="5">下注 $5</button>
+                    <button class="bet-btn" data-bet="10">下注 $10</button>
+                    <button class="bet-btn" data-bet="20">下注 $20</button>
+                    <button class="bet-btn" data-bet="all">梭哈</button>
+                    
+                    <div class="custom-bet-container" style="grid-column: span 2; display: flex; gap: 5px; margin-top: 5px;">
+                        <input type="number" id="customBetInput" min="1" placeholder="输入金额" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
+                        <button class="bet-btn" id="confirmCustomBet" style="flex: 1; background-color: #4db6ac;">确认</button>
                     </div>
+
+                    <button class="clear-bet-btn">清空下注</button>
                 </div>
 
                 <div class="number-selection">
