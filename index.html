@@ -32,6 +32,7 @@
             <button onclick="switchGame('coin-game')">🪙 猜硬币</button>
             <button onclick="switchGame('slots-game')">🎰 老虎机</button>
             <button onclick="switchGame('hilo-game')">🃏 比大小</button>
+            <button onclick="switchGame('blackjack-game')">♠️ 21点</button> </nav>
         </nav>
 
         <p id="message" class="game-message">请先下注，然后选择游戏！</p>
@@ -92,6 +93,32 @@
                 </div>
                 <div id="slot-msg" class="msg-box"></div>
                 <button class="play-btn" onclick="playSlots()">拉动手柄！</button>
+            </div>
+        </section>
+
+        <section id="blackjack-game" class="game-section" style="display:none;">
+            <div class="game-card">
+                <h3>♠️ 智力 21 点 (平局庄家赢)</h3>
+                
+                <div class="bj-area">
+                    <div class="bj-group">
+                        <p>庄家的牌: <span id="dealer-score">??</span></p>
+                        <div id="dealer-cards" class="card-row"></div>
+                    </div>
+                    
+                    <div class="bj-group">
+                        <p>你的牌: <span id="player-score">0</span></p>
+                        <div id="player-cards" class="card-row"></div>
+                    </div>
+                </div>
+
+                <div id="bj-controls" class="hilo-btns">
+                    <button id="bj-start" class="play-btn" onclick="startBJ()">开始发牌</button>
+                    
+                    <button id="bj-hit" class="play-btn" onclick="hitBJ()" style="display:none;">要牌 (Hit)</button>
+                    <button id="bj-double" class="play-btn" onclick="doubleBJ()" style="display:none;">翻倍 (Double)</button> 
+                    <button id="bj-stand" class="play-btn" onclick="standBJ()" style="display:none;">停牌 (Stand)</button>
+                </div>
             </div>
         </section>
 

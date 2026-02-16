@@ -259,5 +259,214 @@ function fullReset() {
     updateUI();
 }
 
-// 初始化
-updateUI();
+let deck = [];
+let playerHand = [];
+let dealerHand = [];
+let isGameOver = true;
+
+function resetBJUI() {
+    document.getElementById('bj-start').style.display = 'inline-block';
+    document.getElementById('bj-hit').style.display = 'none';
+    document.getElementById('bj-double').style.display = 'none';
+    document.getElementById('bj-stand').style.display = 'none';
+    document.getElementById('player-cards').innerHTML = '';
+    document.getElementById('dealer-cards').innerHTML = '';
+    document.getElementById('player-score').textContent = '0';
+    document.getElementById('dealer-score').textContent = '??';
+}
+
+function startBJ() {
+    if (!gameActive) return;
+    if (currentBet <= 0) {
+        showMsg("请先在上方筹码中心下注！", "info");
+        return;
+    }
+
+    bjGameOver = false;
+    // 生成牌组 (直接生成点数，11代表A)
+    bjDeck = [2,3,4,5,6,7,8,9,10,10,10,10,11]; 
+    // 初始发牌
+    pHand = [drawBJCard(), drawBJCard()];
+    dHand = [drawBJCard(), drawBJCard()];
+
+    updateBJDisplay(false);
+
+    // --- 新增：Blackjack 检测逻辑 ---
+    const pScore = getScore(pHand);
+    const dScore = getScore(dHand);
+
+    if (pScore === 21 || dScore === 21) {
+        bjGameOver = true; // 游戏直接结束
+        updateBJDisplay(true); // 翻开庄家的牌对比
+
+        if (pScore === 21 && dScore === 21) {
+            finishBJ("双方都是 Blackjack！平局庄家赢。", "lose");
+        } else if (pScore === 21) {
+            // 玩家 Blackjack，享受 1.5 倍奖励
+            finishBJ("🔥 BLACKJACK！你赢了 1.5 倍！", "win", 1.5);
+        } else {
+            finishBJ("💀 庄家 Blackjack！你输了。", "lose");
+        }
+        return; // 结束函数，不再显示操作按钮
+    }
+
+    // 按钮切换
+    document.getElementById('bj-start').style.display = 'none';
+    document.getElementById('bj-hit').style.display = 'inline-block';
+    document.getElementById('bj-double').style.display = 'inline-block';
+    document.getElementById('bj-stand').style.display = 'inline-block';
+    showMsg("游戏开始，请选择操作", "info");
+}
+
+function drawBJCard() {
+    // 简单模拟无限牌组抽取
+    const cards = [2,3,4,5,6,7,8,9,10,10,10,10,11]; 
+    return cards[Math.floor(Math.random() * cards.length)];
+}
+
+function getScore(hand) {
+    let score = hand.reduce((a, b) => a + b, 0);
+    let aces = hand.filter(c => c === 11).length;
+    // 处理 A 的变值 (11变为1)
+    while (score > 21 && aces > 0) {
+        score -= 10;
+        aces--;
+    }
+    return score;
+}
+
+function updateBJDisplay(showAllDealer) {
+    const pArea = document.getElementById('player-cards');
+    const dArea = document.getElementById('dealer-cards');
+    
+    pArea.innerHTML = pHand.map(c => `<div class="bj-card">${c === 11 ? 'A' : c}</div>`).join('');
+    
+    if (showAllDealer) {
+        dArea.innerHTML = dHand.map(c => `<div class="bj-card">${c === 11 ? 'A' : c}</div>`).join('');
+        document.getElementById('dealer-score').textContent = getScore(dHand);
+    } else {
+        dArea.innerHTML = `<div class="bj-card">${dHand[0] === 11 ? 'A' : dHand[0]}</div><div class="bj-card hidden">?</div>`;
+        document.getElementById('dealer-score').textContent = "??";
+    }
+    document.getElementById('player-score').textContent = getScore(pHand);
+}
+
+function hitBJ() {
+    if (bjGameOver) return;
+    document.getElementById('bj-double').style.display = 'none'; // 要过牌不能翻倍
+    pHand.push(drawBJCard());
+    updateBJDisplay(false);
+
+    if (getScore(pHand) > 21) {
+        finishBJ("你爆牌了！庄家获胜。", "lose");
+    }
+}
+
+function doubleBJ() {
+    if (bjGameOver || pHand.length !== 2) return;
+    if (balance < currentBet * 2) {
+        showMsg("余额不足以支持翻倍！", "info");
+        return;
+    }
+    
+    // 增加下注金额
+    const additionalBet = currentBet;
+    currentBet += additionalBet; 
+    updateUI();
+
+    pHand.push(drawBJCard());
+    updateBJDisplay(false);
+    
+    // 翻倍后不论结果直接停牌
+    if (getScore(pHand) > 21) {
+        finishBJ("翻倍后爆牌了！", "lose");
+    } else {
+        standBJ();
+    }
+}
+
+// --- 🃏 21点 AI 版核心逻辑 ---
+let bjDeck = [];
+let pHand = [];
+let dHand = [];
+let bjGameOver = true;
+
+// 抽取单张牌的逻辑
+function drawBJCard() {
+    const cards = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11]; 
+    return cards[Math.floor(Math.random() * cards.length)];
+}
+
+// 计算点数（含 A 的动态转换）
+function getScore(hand) {
+    let score = hand.reduce((a, b) => a + b, 0);
+    let aces = hand.filter(c => c === 11).length;
+    while (score > 21 && aces > 0) {
+        score -= 10;
+        aces--;
+    }
+    return score;
+}
+
+// 停牌函数：触发庄家 AI 补牌
+async function standBJ() {
+    if (bjGameOver) return;
+    bjGameOver = true; // 立即锁定，防止重复点击
+
+    // 1. 翻开庄家暗牌
+    updateBJDisplay(true);
+    showMsg("庄家回合...", "info");
+
+    // 2. 🤖 庄家 AI 补牌逻辑：不满 17 点必须继续拿牌
+    while (getScore(dHand) < 17) {
+        // 增加 0.6 秒延迟，让玩家看清庄家一张张抽牌的过程
+        await new Promise(resolve => setTimeout(resolve, 600)); 
+        dHand.push(drawBJCard());
+        updateBJDisplay(true);
+    }
+
+    // 3. 最终胜负判定
+    const ps = getScore(pHand);
+    const ds = getScore(dHand);
+
+    if (ds > 21) {
+        finishBJ(`庄家爆牌了(${ds})！你赢了。`, "win");
+    } else if (ps > ds) {
+        finishBJ(`你赢了！${ps} vs ${ds}`, "win");
+    } else if (ps === ds) {
+        // 经典的嘉年华“坑”点：平局庄家赢
+        finishBJ(`平局(${ps})！但庄家通吃。`, "lose");
+    } else {
+        finishBJ(`庄家点数更大(${ds})！你输了。`, "lose");
+    }
+}
+
+function finishBJ(msg, type) {
+    showMsg(msg, type);
+    
+    if (type === "win") {
+        balance += currentBet; // 赢得赌注
+    } else {
+        balance -= currentBet; // 失去赌注
+    }
+    
+    currentBet = 0;
+    updateUI();
+    
+    // 允许玩家再次点击“开始发牌”
+    setTimeout(() => {
+        document.getElementById('bj-start').style.display = 'inline-block';
+        document.getElementById('bj-hit').style.display = 'none';
+        document.getElementById('bj-double').style.display = 'none';
+        document.getElementById('bj-stand').style.display = 'none';
+    }, 2000);
+}
+
+function fullReset() {
+    balance = 100;
+    currentBet = 0;
+    gameActive = true;
+    document.getElementById('resetGameBtn').style.display = 'none';
+    showMsg("已重置资金，祝你好运！");
+    updateUI();
+}
