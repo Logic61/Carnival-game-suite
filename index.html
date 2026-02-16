@@ -2,66 +2,101 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>嘉年华骰子 - Chuck-a-Luck</title>
+    <title>嘉年华中心大厅</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Open+Sans&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="carnival-background">
-        <header>
-            <h1><span class="sparkle">🎉</span> 嘉年华骰子 <span class="sparkle">🎉</span></h1>
-            <h2>Chuck-a-Luck</h2>
-        </header>
+    <div class="carnival-hall">
+        <h1>🎡 嘉年华中心大厅 🎡</h1>
 
-        <main class="game-container">
-            <div class="scoreboard">
-                <p>筹码余额: $<span id="balance">100</span></p>
-                <p>下注金额: $<span id="currentBet">0</span></p>
+        <div class="public-betting-center">
+            <div class="stats">
+                <p>💰 余额: $<span id="balance">100</span></p>
+                <p>🔥 准备下注: $<span id="currentBet">0</span></p>
             </div>
-
-            <div class="player-actions">
-                <div class="bet-buttons">
-                    <button class="bet-btn" data-bet="5">下注 $5</button>
-                    <button class="bet-btn" data-bet="10">下注 $10</button>
-                    <button class="bet-btn" data-bet="20">下注 $20</button>
-                    <button class="bet-btn" data-bet="all">梭哈</button>
-                    
-                    <div class="custom-bet-container" style="grid-column: span 2; display: flex; gap: 5px; margin-top: 5px;">
-                        <input type="number" id="customBetInput" min="1" placeholder="输入金额" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
-                        <button class="bet-btn" id="confirmCustomBet" style="flex: 1; background-color: #4db6ac;">确认</button>
-                    </div>
-
-                    <button class="clear-bet-btn">清空下注</button>
+            
+            <div class="bet-controls">
+                <button onclick="handleBet(10)">+$10</button>
+                <button onclick="handleBet(50)">+$50</button>
+                <button onclick="handleBet('all')">全压 (ALL-IN)</button>
+                <div class="custom-group">
+                    <input type="number" id="customBetInput" placeholder="自定义金额">
+                    <button onclick="confirmCustom()">确认</button>
                 </div>
-
-                <div class="number-selection">
-                    <h3>选择你的幸运数字</h3>
-                    <div class="number-grid">
-                        <button class="num-btn" data-number="1">1</button>
-                        <button class="num-btn" data-number="2">2</button>
-                        <button class="num-btn" data-number="3">3</button>
-                        <button class="num-btn" data-number="4">4</button>
-                        <button class="num-btn" data-number="5">5</button>
-                        <button class="num-btn" data-number="6">6</button>
-                    </div>
-                </div>
+                <button class="clear-btn" onclick="resetBet()">清空下注</button>
             </div>
+        </div>
 
-            <button id="rollDiceBtn" class="big-button" disabled>摇骰子！</button>
+        <nav class="game-nav">
+            <button onclick="switchGame('dice-game')">🎲 摇骰子</button>
+            <button onclick="switchGame('coin-game')">🪙 猜硬币</button>
+            <button onclick="switchGame('slots-game')">🎰 老虎机</button>
+            <button onclick="switchGame('hilo-game')">🃏 比大小</button>
+        </nav>
 
-            <div class="dice-display">
+        <p id="message" class="game-message">请先下注，然后选择游戏！</p>
+
+        <section id="dice-game" class="game-section">
+            <h3>嘉年华骰子 (Chuck-a-Luck)</h3>
+            <p>选择一个幸运数字：</p>
+            <div class="number-grid">
+                <button class="num-btn" onclick="selectNum(1)">1</button>
+                <button class="num-btn" onclick="selectNum(2)">2</button>
+                <button class="num-btn" onclick="selectNum(3)">3</button>
+                <button class="num-btn" onclick="selectNum(4)">4</button>
+                <button class="num-btn" onclick="selectNum(5)">5</button>
+                <button class="num-btn" onclick="selectNum(6)">6</button>
+            </div>
+            <button class="play-btn" onclick="playDice()">摇晃骰子！</button>
+            <div class="dice-container">
                 <div class="dice" id="dice1">?</div>
                 <div class="dice" id="dice2">?</div>
                 <div class="dice" id="dice3">?</div>
             </div>
+        </section>
 
-            <p id="message" class="game-message"></p>
+        <section id="coin-game" class="game-section" style="display:none;">
+            <div class="game-card">
+                <h3>🪙 猜硬币 (双倍赔率)</h3>
+                <div class="coin-wrapper">
+                    <div class="coin" id="coinResult">正</div>
+                </div>
+                <div class="coin-btns">
+                    <button class="play-btn" onclick="playCoin('正')">猜正面 (Heads)</button>
+                    <button class="play-btn" onclick="playCoin('反')">猜反面 (Tails)</button>
+                </div>
+            </div>
+        </section>
 
-            <button id="resetGameBtn" class="small-button">重新开始</button>
-        </main>
+        <section id="hilo-game" class="game-section" style="display:none;">
+            <div class="game-card">
+                <h3>🃏 比大小 (倍率: 1.9x)</h3>
+                <div class="card-display">
+                    <div id="currentCard" class="card">7</div>
+                </div>
+                <p>下一张牌会更...？</p>
+                <div class="hilo-btns">
+                    <button class="play-btn" onclick="playHiLo('high')">更大 (High)</button>
+                    <button class="play-btn" onclick="playHiLo('low')">更小 (Low)</button>
+                </div>
+            </div>
+        </section>
+        
+        <section id="slots-game" class="game-section" style="display:none;">
+            <div class="game-card">
+                <h3>🎰 欢乐老虎机</h3>
+                <div class="slots-container">
+                    <div class="slot" id="slot1"><div class="slot-strip">❓</div></div>
+                    <div class="slot" id="slot2"><div class="slot-strip">❓</div></div>
+                    <div class="slot" id="slot3"><div class="slot-strip">❓</div></div>
+                </div>
+                <div id="slot-msg" class="msg-box"></div>
+                <button class="play-btn" onclick="playSlots()">拉动手柄！</button>
+            </div>
+        </section>
+
+        <button id="resetGameBtn" style="display:none; margin: 20px auto;" onclick="fullReset()">破产重开</button>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
